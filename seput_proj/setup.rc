@@ -1,0 +1,30 @@
+id ICON "setup.ico"
+
+1 VERSIONINFO
+ FILEVERSION 1,1,2,26
+ PRODUCTVERSION 1,1,2,26
+ FILEFLAGS 0x0L
+ FILEFLAGSMASK 0x3fL
+ FILEOS 0x00040004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "CompanyName", "roosslan"
+            VALUE "FileDescription", "roosslan's msi launcher"
+            VALUE "FileVersion", "1.1.2.26"
+            VALUE "LegalCopyright", "Copyright (C) 2022 - 2026 roosslan"
+            VALUE "InternalName", "setup"
+            VALUE "OriginalFilename", "setup.exe"
+            VALUE "ProductName", "msi launcher"
+            VALUE "ProductVersion", "1.1.2.26"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END

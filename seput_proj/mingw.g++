@@ -1,0 +1,1 @@
+/* build: * g++ setup.cpp -static-libgcc -static-libstdc++ */

@@ -1,0 +1,717 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WixSharp.UI.WPF</name>
+    </assembly>
+    <members>
+        <member name="T:WixSharp.UI.WPF.CustomDialogBase">
+             <summary>
+             This class is not to be used directly. This class is used by WixSharp runtime as a
+             container for a user defined content (a WPF UserControl) of the custom dialog.
+             <para>This class is a convenient way of defining custom UI dialogs without defining
+             the full UI layout of the dialog but only a small area implementing the business logic
+             of the setup step/phase
+             </para>
+             </summary>
+             <example>The following is an example of adding a UserControl ('CustomDialogPanel') as a
+             content of the custom dialog. Note, your control must implement <see cref="T:WixSharp.UI.WPF.IWpfDialogContent"/>
+             interface so WixSharp recognizes it as an embeddable custom dialog content.<code>
+             project.ManagedUI.InstallDialogs.Add&gt;WelcomeDialog&gt;()
+                                             .Add&gt;FeaturesDialog&gt;()
+                                             .Add&gt;CustomDialogWith&lt;CustomDialogPanel&gt;&gt;()
+             . . .
+             public partial class CustomDialogPanel : UserControl, IWpfDialogContent
+             {
+                 public CustomDialogPanel()
+                 {
+                     InitializeComponent();
+                 }
+            
+                 public void Init(CustomDialogBase parent)
+                 {
+                     ISession session = parent?.ManagedFormHost.Runtime.Session;
+                     . . .
+            
+             </code>
+             </example>
+             <seealso cref="T:WixSharp.UI.WPF.WpfDialog" />
+             <seealso cref="T:WixSharp.IWpfDialog" />
+             <seealso cref="T:System.Windows.Markup.IComponentConnector" />
+            <summary>
+            CustomDialogBase
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.CustomDialogBase.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:WixSharp.UI.WPF.CustomDialogBase"/> class.
+            </summary>
+        </member>
+        <member name="P:WixSharp.UI.WPF.CustomDialogBase.ButtonsPanel">
+            <summary>
+            Gets the panel (<see cref="T:System.Windows.Controls.StackPanel"/>) with the navigation buttons (Back, Next and Cancel).
+            </summary>
+            <value>
+            The buttons panel.
+            </value>
+        </member>
+        <member name="P:WixSharp.UI.WPF.CustomDialogBase.Buttons">
+            <summary>
+            Gets the default navigation buttons (Back, Next and Cancel).
+            </summary>
+            <value>
+            The navigation buttons.
+            </value>
+        </member>
+        <member name="P:WixSharp.UI.WPF.CustomDialogBase.GoNextButton">
+            <summary>
+            Gets the standard 'Next' navigation button.
+            </summary>
+            <value>
+            The 'Next' button.
+            </value>
+        </member>
+        <member name="P:WixSharp.UI.WPF.CustomDialogBase.GoPrevButton">
+            <summary>
+            Gets the standard 'Back' navigation button.
+            </summary>
+            <value>
+            The 'Beck' button.
+            </value>
+        </member>
+        <member name="P:WixSharp.UI.WPF.CustomDialogBase.CancelButton">
+            <summary>
+            Gets the standard 'Cancel' navigation button.
+            </summary>
+            <value>
+            The 'Cancel' button.
+            </value>
+        </member>
+        <member name="M:WixSharp.UI.WPF.CustomDialogBase.Init">
+            <summary>
+            This method is invoked by WixSHarp runtime when the custom dialog content is internally fully initialized.
+            This is a convenient place to do further initialization activities (e.g. localization).
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.CustomDialogBase.SetUserContent(System.Object)">
+            <summary>
+            Sets the content of the user defined custom dialog panel. This method is to be only invoked by WixSHarp runtime.
+            </summary>
+            <param name="userContent">Content of the user.</param>
+        </member>
+        <member name="M:WixSharp.UI.WPF.CustomDialogBase.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.NotifyPropertyChangedBase">
+             <summary>
+            
+             </summary>
+             <seealso cref="T:System.ComponentModel.INotifyPropertyChanged" />
+        </member>
+        <member name="E:WixSharp.UI.WPF.NotifyPropertyChangedBase.PropertyChanged">
+            <summary>
+            Occurs when a property value changes.
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.NotifyPropertyChangedBase.NotifyOfPropertyChange(System.String)">
+            <summary>
+            Notifies the of property change.
+            </summary>
+            <param name="propertyName">Name of the property.</param>
+        </member>
+        <member name="T:WixSharp.UI.WPF.ExitDialog">
+            <summary>
+            The standard ExitDialog.
+            </summary>
+            <seealso cref="T:WixSharp.UI.WPF.WpfDialog" />
+            <seealso cref="T:WixSharp.IWpfDialog" />
+            <seealso cref="T:System.Windows.Markup.IComponentConnector" />
+            <summary>
+            ExitDialog
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.ExitDialog.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:WixSharp.UI.WPF.ExitDialog"/> class.
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.ExitDialog.Init">
+            <summary>
+            This method is invoked by WixSHarp runtime when the custom dialog content is internally fully initialized.
+            This is a convenient place to do further initialization activities (e.g. localization).
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.ExitDialog.UpdateTitles(WixSharp.ISession)">
+            <summary>
+            Updates the titles of the dialog depending on the success of the installation action.
+            </summary>
+            <param name="session">The session.</param>
+        </member>
+        <member name="M:WixSharp.UI.WPF.ExitDialog.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.ExitDialogModel">
+            <summary>
+            ViewModel for standard ExitDialog.
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.FeaturesDialog">
+            <summary>
+            The standard FeaturesDialog.
+            </summary>
+            <seealso cref="T:WixSharp.UI.WPF.WpfDialog" />
+            <seealso cref="T:WixSharp.IWpfDialog" />
+            <seealso cref="T:System.Windows.Markup.IComponentConnector" />
+            <summary>
+            FeaturesDialog
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.FeaturesDialog.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:WixSharp.UI.WPF.FeaturesDialog"/> class.
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.FeaturesDialog.Init">
+            <summary>
+            This method is invoked by WixSHarp runtime when the custom dialog content is internally fully initialized.
+            This is a convenient place to do further initialization activities (e.g. localization).
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.FeaturesDialog.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.Node">
+            <summary>
+            ViewModel of the feature tree node.
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.FeaturesDialogModel">
+            <summary>
+            ViewModel for standard FeaturesDialog.
+            </summary>
+        </member>
+        <member name="P:WixSharp.UI.WPF.FeaturesDialogModel.UserSelectedItems">
+            <summary>
+            The collection of the features selected by user as the features to be installed.
+            </summary>
+        </member>
+        <member name="P:WixSharp.UI.WPF.FeaturesDialogModel.InitialUserSelectedItems">
+            <summary>
+            The initial/default set of selected items (features) before user made any selection(s).
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.InstallDirDialog">
+            <summary>
+            The standard InstallDirDialog.
+            </summary>
+            <seealso cref="T:WixSharp.UI.WPF.WpfDialog" />
+            <seealso cref="T:System.Windows.Markup.IComponentConnector" />
+            <seealso cref="T:WixSharp.IWpfDialog" />
+            <summary>
+            InstallDirDialog
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.InstallDirDialog.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:WixSharp.UI.WPF.InstallDirDialog"/> class.
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.InstallDirDialog.Init">
+            <summary>
+            This method is invoked by WixSHarp runtime when the custom dialog content is internally fully initialized.
+            This is a convenient place to do further initialization activities (e.g. localization).
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.InstallDirDialog.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.InstallDirDialogModel">
+            <summary>
+            ViewModel for standard InstallDirDialog.
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.LicenceDialog">
+            <summary>
+            The standard LicenceDialog.
+            </summary>
+            <seealso cref="T:WixSharp.UI.WPF.WpfDialog" />
+            <seealso cref="T:System.Windows.Markup.IComponentConnector" />
+            <seealso cref="T:WixSharp.IWpfDialog" />
+            <summary>
+            LicenceDialog
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.LicenceDialog.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:WixSharp.UI.WPF.LicenceDialog"/> class.
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.LicenceDialog.Init">
+            <summary>
+            This method is invoked by WixSHarp runtime when the custom dialog content is internally fully initialized.
+            This is a convenient place to do further initialization activities (e.g. localization).
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.LicenceDialog.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.LicenseDialogModel">
+            <summary>
+            ViewModel for standard LicenceDialog.
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.MaintenanceTypeDialog">
+            <summary>
+            The standard MaintenanceTypeDialog.
+            </summary>
+            <seealso cref="T:WixSharp.UI.WPF.WpfDialog" />
+            <seealso cref="T:WixSharp.IWpfDialog" />
+            <seealso cref="T:System.Windows.Markup.IComponentConnector" />
+            <summary>
+            MaintenanceTypeDialog
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.MaintenanceTypeDialog.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:WixSharp.UI.WPF.MaintenanceTypeDialog" /> class.
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.MaintenanceTypeDialog.Init">
+            <summary>
+            This method is invoked by WixSHarp runtime when the custom dialog content is internally fully initialized.
+            This is a convenient place to do further initialization activities (e.g. localization).
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.MaintenanceTypeDialog.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.MaintenanceTypeDialogModel">
+            <summary>
+            ViewModel for standard MaintenanceTypeDialog.
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.MaintenanceTypeDialogModel.JumpToProgressDialog">
+            <summary>
+            Initializes a new instance of the <see cref="T:WixSharp.UI.WPF.MaintenanceTypeDialog" /> class.
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.ProgressDialog">
+            <summary>
+            The standard ProgressDialog.
+            </summary>
+            <seealso cref="T:WixSharp.UI.WPF.WpfDialog" />
+            <seealso cref="T:WixSharp.IWpfDialog" />
+            <seealso cref="T:System.Windows.Markup.IComponentConnector" />
+            <summary>
+            ProgressDialog
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.ProgressDialog.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:WixSharp.UI.WPF.ProgressDialog" /> class.
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.ProgressDialog.Init">
+            <summary>
+            This method is invoked by WixSharp runtime when the custom dialog content is internally fully initialized.
+            This is a convenient place to do further initialization activities (e.g. localization).
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.ProgressDialog.UpdateTitles(WixSharp.ISession)">
+            <summary>
+            Updates the titles of the dialog depending on what type of installation action MSI is performing.
+            </summary>
+            <param name="session">The session.</param>
+        </member>
+        <member name="M:WixSharp.UI.WPF.ProgressDialog.ProcessMessage(WixToolset.Dtf.WindowsInstaller.InstallMessage,WixToolset.Dtf.WindowsInstaller.Record,WixToolset.Dtf.WindowsInstaller.MessageButtons,WixToolset.Dtf.WindowsInstaller.MessageIcon,WixToolset.Dtf.WindowsInstaller.MessageDefaultButton)">
+            <summary>
+            Processes information and progress messages sent to the user interface.
+            <para> This method directly mapped to the
+            <see cref="T:Microsoft.Deployment.WindowsInstaller.IEmbeddedUI.ProcessMessage" />.</para>
+            </summary>
+            <param name="messageType">Type of the message.</param>
+            <param name="messageRecord">The message record.</param>
+            <param name="buttons">The buttons.</param>
+            <param name="icon">The icon.</param>
+            <param name="defaultButton">The default button.</param>
+            <returns></returns>
+        </member>
+        <member name="M:WixSharp.UI.WPF.ProgressDialog.OnExecuteComplete">
+            <summary>
+            Called when MSI execution is complete.
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.ProgressDialog.OnProgress(System.Int32)">
+            <summary>
+            Called when MSI execution progress is changed.
+            </summary>
+            <param name="progressPercentage">The progress percentage.</param>
+        </member>
+        <member name="M:WixSharp.UI.WPF.ProgressDialog.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.ProgressDialogModel">
+            <summary>
+            ViewModel for standard ProgressDialog.
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.SetupTypeDialog">
+            <summary>
+            The standard SetupTypeDialog.
+            </summary>
+            <seealso cref="T:WixSharp.UI.WPF.WpfDialog" />
+            <seealso cref="T:WixSharp.IWpfDialog" />
+            <seealso cref="T:System.Windows.Markup.IComponentConnector" />
+            <summary>
+            SetupTypeDialog
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.SetupTypeDialog.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:WixSharp.UI.WPF.SetupTypeDialog" /> class.
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.SetupTypeDialog.Init">
+            <summary>
+            This method is invoked by WixSHarp runtime when the custom dialog content is internally fully initialized.
+            This is a convenient place to do further initialization activities (e.g. localization).
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.SetupTypeDialog.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.SetupTypeDialogModel">
+            <summary>
+            ViewModel for standard SetupTypeDialog.
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.SetupTypeDialogModel.JumpToProgressDialog">
+            <summary>
+            Initializes a new instance of the <see cref="T:WixSharp.UI.WPF.SetupTypeDialog" /> class.
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.WelcomeDialog">
+            <summary>
+            The standard WelcomeDialog.
+            </summary>
+            <seealso cref="T:WixSharp.UI.WPF.WpfDialog" />
+            <seealso cref="T:WixSharp.IWpfDialog" />
+            <seealso cref="T:System.Windows.Markup.IComponentConnector" />
+            <summary>
+            WelcomeDialog
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.WelcomeDialog.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:WixSharp.UI.WPF.WelcomeDialog" /> class.
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.WelcomeDialog.Init">
+            <summary>
+            This method is invoked by WixSHarp runtime when the custom dialog content is internally fully initialized.
+            This is a convenient place to do further initialization activities (e.g. localization).
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.WelcomeDialog.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.WelcomeDialogModel">
+            <summary>
+            ViewModel for standard WelcomeDialog.
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.ManagedWpfUI">
+             <summary>
+             Implements as standard dialog-based MSI embedded UI as a sequence of WPF dialogs.
+             <para>
+             This class allows defining separate sequences of UI dialogs for 'install'
+             and 'modify' MSI executions. The dialog sequence can contain any mixture
+             of built-in standard dialogs and/or custom WPF dialogs.
+             </para>
+             </summary>
+             <example>
+             <code>
+             using WixSharp.UI.WPF;
+             ...
+             project.ManagedUI = new ManagedDpfUI();
+             project.ManagedUI.InstallDialogs.Add(Dialogs.Welcome)
+                                             .Add(Dialogs.Licence)
+                                             .Add(Dialogs.SetupType)
+                                             .Add(Dialogs.Features)
+                                             .Add(Dialogs.InstallDir)
+                                             .Add(Dialogs.Progress)
+                                             .Add(Dialogs.Exit);
+            
+             project.ManagedUI.ModifyDialogs.Add(Dialogs.MaintenanceType)
+                                            .Add(Dialogs.Features)
+                                            .Add(Dialogs.Progress)
+                                            .Add(Dialogs.Exit);
+            
+             // or
+            
+              project.ManagedUI = ManagedWpfUI.Default;
+            
+             </code>
+             </example>
+        </member>
+        <member name="P:WixSharp.UI.WPF.ManagedWpfUI.Default">
+            <summary>
+            The default WPF implementation of ManagedUI. It implements all major dialogs of a typical MSI UI.
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.DependencyDescriptor">
+            <summary>
+            Returns an array of AssemblyName that defines referenced assemblies required at runtime for WixSharp WPF dialogs.
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.DependencyDescriptor.GetRefAssemblies">
+            <summary>
+            Gets the referenced assemblies.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:WixSharp.UI.WPF.Extensions">
+            <summary>
+            WPF related generic method extensions
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.Extensions.ToImageSource(System.Drawing.Bitmap)">
+            <summary>
+            </summary>
+            <param name="src">The source.</param>
+            <returns></returns>
+        </member>
+        <member name="M:WixSharp.UI.WPF.Extensions.Localize(WixSharp.InstallerRuntime,System.Windows.DependencyObject)">
+            <summary>
+            Localizes the specified WPF element and its children.
+            <para>The localization is performed according
+            <see cref="M:WixSharp.InstallerRuntime.Localize(System.String)"/> localization behavior.</para>
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:WixSharp.UI.WPF.Extensions.GetChildrenOfType``1(System.Windows.DependencyObject)">
+            <summary>
+            Gets the <see cref="T:System.Windows.DependencyObject"/> children of the specified type.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="depObj">The <see cref="T:System.Windows.DependencyObject"/> instance.</param>
+            <returns></returns>
+        </member>
+        <member name="T:WixSharp.UI.WPF.IWpfDialogContent">
+             <summary>
+             Interface that marks WPF content (e.g. UserControl) as a content that can be embedded in
+             the custom dialog.
+             </summary>
+             <example>The following is an example of adding a UserControl ('CustomDialogPanel') as a
+             content of the custom dialog. Note, your control must implement <see cref="T:WixSharp.UI.WPF.IWpfDialogContent"/>
+             interface so WixSharp recognizes it as an embeddable custom dialog content.<code>
+             project.ManagedUI.InstallDialogs.Add&gt;WelcomeDialog&gt;()
+                                             .Add&gt;FeaturesDialog&gt;()
+                                             .Add&gt;CustomDialogWith&lt;CustomDialogPanel&gt;&gt;()
+             . . .
+             public partial class CustomDialogPanel : UserControl, IWpfDialogContent
+             {
+                 public CustomDialogPanel()
+                 {
+                     InitializeComponent();
+                 }
+            
+                 public void Init(CustomDialogBase parent)
+                 {
+                     ISession session = parent?.ManagedFormHost.Runtime.Session;
+                     . . .
+            
+             </code>
+             </example>
+             <seealso cref="T:WixSharp.IDialog" />
+        </member>
+        <member name="M:WixSharp.UI.WPF.IWpfDialogContent.Init(WixSharp.UI.WPF.CustomDialogBase)">
+            <summary>
+            Initializes the instance of <see cref="T:WixSharp.UI.WPF.IWpfDialogContent"/> and passes the
+            reference to the parent dialog. It is a good place to adjust layout including parent dialog
+            element (e.g. disable "Next" button). Or do localization
+            </summary>
+            <param name="parentDialog">The parent dialog.</param>
+        </member>
+        <member name="T:WixSharp.UI.WPF.WpfDialog">
+            <summary>
+            A base class for WPF custom dialogs.
+            </summary>
+            <seealso cref="T:System.Windows.Controls.UserControl" />
+            <seealso cref="T:WixSharp.IManagedDialog" />
+        </member>
+        <member name="P:WixSharp.UI.WPF.WpfDialog.DialogTitle">
+            <summary>
+            Gets or sets the dialog title.
+            </summary>
+            <value>
+            The dialog title.
+            </value>
+        </member>
+        <member name="P:WixSharp.UI.WPF.WpfDialog.Host">
+            <summary>
+            Gets or sets the reference to the dialog host (e.g. <see cref="T:WixSharp.UI.Forms.ManagedForm"/>).
+            </summary>
+            <value>
+            The host.
+            </value>
+        </member>
+        <member name="P:WixSharp.UI.WPF.WpfDialog.ManagedFormHost">
+            <summary>
+            Gets or sets the reference to the dialog host.
+            <para>This property is the same as <see cref="P:WixSharp.UI.WPF.WpfDialog.Host"/> except it returns already typecasted host instance</para>
+            </summary>
+            <value>
+            The managed form host.
+            </value>
+        </member>
+        <member name="P:WixSharp.UI.WPF.WpfDialog.Shell">
+            <summary>
+            Gets or sets the UI shell (main UI window). This property is set the ManagedUI runtime (IManagedUI).
+            On the other hand it is consumed (accessed) by the UI dialog (IManagedDialog).
+            </summary>
+            <value>
+            The shell.
+            </value>
+        </member>
+        <member name="M:WixSharp.UI.WPF.WpfDialog.Localize(System.Windows.DependencyObject)">
+            <summary>
+            Called when MSI execution is complete.
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.WpfDialog.OnExecuteComplete">
+            <summary>
+            Called when MSI execution is complete.
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.WpfDialog.OnExecuteStarted">
+            <summary>
+            Called when MSI execute started.
+            </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.WpfDialog.OnProgress(System.Int32)">
+            <summary>
+            Called when MSI execution progress is changed.
+            </summary>
+            <param name="progressPercentage">The progress percentage.</param>
+        </member>
+        <member name="M:WixSharp.UI.WPF.WpfDialog.ProcessMessage(WixToolset.Dtf.WindowsInstaller.InstallMessage,WixToolset.Dtf.WindowsInstaller.Record,WixToolset.Dtf.WindowsInstaller.MessageButtons,WixToolset.Dtf.WindowsInstaller.MessageIcon,WixToolset.Dtf.WindowsInstaller.MessageDefaultButton)">
+            <summary>
+            Processes information and progress messages sent to the user interface.
+            <para> This method directly mapped to the
+            <see cref="T:Microsoft.Deployment.WindowsInstaller.IEmbeddedUI.ProcessMessage" />.</para>
+            </summary>
+            <param name="messageType">Type of the message.</param>
+            <param name="messageRecord">The message record.</param>
+            <param name="buttons">The buttons.</param>
+            <param name="icon">The icon.</param>
+            <param name="defaultButton">The default button.</param>
+            <returns></returns>
+        </member>
+        <member name="T:WixSharp.UI.WPF.WpfDialogHost">
+            <summary>
+            A managed dialog (WinForm) class that is capable of hosting WPF content. This class it to be use by WixSharp runtime only and not
+            intended to be a part of any user code (setup definition).
+            <para>Note WixSharp uses this class via Reflection with <see cref="M:WixSharp.UIShell.CreateDefaultWpfDialgHost"/></para>
+            </summary>
+            <seealso cref="T:WixSharp.UI.Forms.ManagedForm" />
+            <seealso cref="T:WixSharp.IManagedDialog" />
+            <seealso cref="T:WixSharp.IWpfDialogHost" />
+        </member>
+        <member name="M:WixSharp.UI.WPF.WpfDialogHost.SetDialogContent(WixSharp.IWpfDialog)">
+            <summary>
+            Sets the content of the dialog.
+            </summary>
+            <param name="content">The content.</param>
+        </member>
+        <member name="M:WixSharp.UI.WPF.WpfDialogHost.ProcessMessage(WixToolset.Dtf.WindowsInstaller.InstallMessage,WixToolset.Dtf.WindowsInstaller.Record,WixToolset.Dtf.WindowsInstaller.MessageButtons,WixToolset.Dtf.WindowsInstaller.MessageIcon,WixToolset.Dtf.WindowsInstaller.MessageDefaultButton)">
+             <summary>
+            
+             </summary>
+             <param name="messageType"></param>
+             <param name="messageRecord"></param>
+             <param name="buttons"></param>
+             <param name="icon"></param>
+             <param name="defaultButton"></param>
+             <returns></returns>
+        </member>
+        <member name="M:WixSharp.UI.WPF.WpfDialogHost.OnExecuteComplete">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.WpfDialogHost.OnExecuteStarted">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="M:WixSharp.UI.WPF.WpfDialogHost.OnProgress(System.Int32)">
+             <summary>
+            
+             </summary>
+             <param name="progressPercentage"></param>
+        </member>
+        <member name="M:WixSharp.UI.WPF.WpfDialogHost.OnShellChanged">
+            <summary>
+            Called when Shell is changed. It is a good place to initialize the dialog to reflect the MSI session
+            (e.g. localize the view).
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.BoolToBackgroundConverter">
+             <summary>
+            
+             </summary>
+             <seealso cref="T:System.Windows.Data.IValueConverter" />
+        </member>
+        <member name="M:WixSharp.UI.WPF.BoolToBackgroundConverter.Convert(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            Converts a value.
+            </summary>
+            <param name="value">The value produced by the binding source.</param>
+            <param name="targetType">The type of the binding target property.</param>
+            <param name="parameter">The converter parameter to use.</param>
+            <param name="culture">The culture to use in the converter.</param>
+            <returns>
+            A converted value. If the method returns <see langword="null" />, the valid null value is used.
+            </returns>
+        </member>
+        <member name="M:WixSharp.UI.WPF.BoolToBackgroundConverter.ConvertBack(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            Converts a value back.
+            </summary>
+        </member>
+        <member name="T:WixSharp.UI.WPF.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:WixSharp.UI.WPF.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:WixSharp.UI.WPF.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+    </members>
+</doc>
