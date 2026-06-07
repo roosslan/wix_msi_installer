@@ -31,8 +31,8 @@ namespace wix_installer {
             {
                 Console::WriteLine(f->Name);
             }
-            project->ResolveWildCards()->FindFile(f->Name->EndsWith("ExportToApplication.exe"))->First()
-                    .Shortcuts = new[] { new FileShortcut("ExportTo", desktopDirectoryPath) };
+            project->ResolveWildCards()->FindFile(f->Name->EndsWith("ifc_exporter.exe"))->First()
+                    .Shortcuts = new[] { new FileShortcut("IFC Exporter", desktopDirectoryPath) };
             */
 
             project->Scope = WixSharp::InstallScope::perUser;

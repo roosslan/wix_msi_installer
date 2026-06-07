@@ -4,7 +4,8 @@ The Active Platform Configuration should be "Release" (for Bamboo, Teamcity etc)
 
  \
 The 'wix_msi_installer' project's platform should be "Win32"\
-(Wix supports only Win32)
+(Wix supports only Win32) \
+background.gif and top_banner.gif - they are images shown during setup process
 
 \
 Updated: 11 Oct 2024 (Весна даёт цветы, а осень — плоды) \
