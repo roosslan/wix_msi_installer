@@ -17,7 +17,8 @@ namespace wix_installer {
 
             string app_data_path = Environment::GetFolderPath(Environment::SpecialFolder::ApplicationData);
 
-            auto rel_files_from_dir = gcnew String(relativ_files_from_dir);       /* The path where files from (relative) */
+			/* Все директории и файлы из rel_files_from_dir будут добавлены в .msi */
+            auto rel_files_from_dir = gcnew String(relativ_files_from_dir);
 
             auto project = gcnew ManagedProject("net8project" + addin_version,
                 gcnew Dir("%AppDataFolder%\\roosslan\\net8project",               /* INSTALLDIR */
