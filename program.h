@@ -11,6 +11,8 @@ namespace wix_installer {
 		static ini_plain^ ini_file;
 		static string set_up_log_config();
 		static void add_directories(ManagedProject^ project, string rel_files_from_dir);
+		static bool is_payload(string path);
+		static void stop_processes(SetupEventArgs^ e, string name);
 		static void msi_after_install(SetupEventArgs^ e);
 		static void msi_before_install(SetupEventArgs^ e);
 		static void ui_initialized(SetupEventArgs^ e);
