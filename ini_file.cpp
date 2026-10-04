@@ -1,4 +1,4 @@
-
+﻿
 #include "ini_file.h"
 
 namespace wix_installer {
@@ -7,24 +7,36 @@ namespace wix_installer {
         }
 
         string ini_plain::read_string(string section, string key) {
-            auto ret_val = gcnew StringBuilder(255);
-            GetPrivateProfileString(section, key, "", ret_val, 255, ext_path_);
-            return ret_val->ToString();
+            return read_string(section, key, "");
+        }
+
+        string ini_plain::read_string(string section, string key, string default_value) {
+            /* Буфер растёт, пока значение не поместится целиком */
+            for (unsigned int size = 256; size <= 65536; size *= 2) {
+                auto ret_val = gcnew StringBuilder((int)size);
+                unsigned int n = GetPrivateProfileString(section, key, default_value, ret_val, size, ext_path_);
+                if (n < size - 1)
+                    return ret_val->ToString();
+            }
+            throw gcnew InvalidDataException("Значение [" + section + "] " + key + " в " + ext_path_ + " слишком длинное");
         }
 
         void ini_plain::write_string(string section, string key, string value) {
-            WritePrivateProfileString(section, key, value, ext_path_);
+            if (!WritePrivateProfileString(section, key, value, ext_path_))
+                throw gcnew System::ComponentModel::Win32Exception(Marshal::GetLastWin32Error());
         }
 
         void ini_plain::delete_key(string section, string key) {
-            WritePrivateProfileString(section, key, nullptr, ext_path_);
+            write_string(section, key, nullptr);
         }
 
         void ini_plain::delete_section(string section) {
-            WritePrivateProfileString(section, nullptr, nullptr, ext_path_);
+            write_string(section, nullptr, nullptr);
         }
 
         bool ini_plain::key_exists(string section, string key) {
-            return read_string(section, key)->Length > 0;
+            /* Маркер, которого не может быть в реальном файле: отличает отсутствующий ключ от пустого значения */
+            string marker = "\x01<missing>";
+            return !String::Equals(read_string(section, key, marker), marker);
         }
     }

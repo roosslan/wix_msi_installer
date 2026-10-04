@@ -22,7 +22,8 @@ namespace wix_installer {
 
             auto project = gcnew ManagedProject("net8project" + addin_version,
                 gcnew Dir("%AppDataFolder%\\roosslan\\net8project",               /* INSTALLDIR */
-                    gcnew WixSharp::Files(rel_files_from_dir + "\\*.*")));
+                    gcnew WixSharp::Files(rel_files_from_dir + "\\*.*",
+                                          gcnew Predicate<string>(&wix_builder::is_payload))));
 
             wix_builder::add_directories(project, rel_files_from_dir);
 
@@ -101,26 +102,72 @@ namespace wix_installer {
         /* app.config служит для указания пути к логу */
 		WixSharp::CommonTasks::Tasks::AddDir(project, gcnew Dir("%AppDataFolder%\\net8project", gcnew WixSharp::File(rel_files_from_dir + "\\Files\\app.config")));
         WixSharp::CommonTasks::Tasks::AddDir(project, gcnew Dir("%AppDataFolder%\\net8project", gcnew WixSharp::File(rel_files_from_dir + "\\Files\\ifcxeprt.inf")));
+
+        /* Автозагрузка через таблицу Registry MSI: при удалении записи удаляются автоматически */
+        string run_key = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
+        WixSharp::CommonTasks::Tasks::AddRegValue(project, gcnew RegValue(RegistryHive::CurrentUser, run_key, "ifc_exporter", "\"[INSTALLDIR]bgHelper.exe\""));
+        WixSharp::CommonTasks::Tasks::AddRegValue(project, gcnew RegValue(RegistryHive::CurrentUser, run_key, "db_checker", "\"[INSTALLDIR]dbchecker.exe\""));
     };
 
+    /* Фильтр файлов для .msi: отладочные файлы не включаются, содержимое Files\ раскладывается в add_directories */
+    bool wix_builder::is_payload(string path) {
+        string ext = Path::GetExtension(path)->ToLowerInvariant();
+        if (ext == ".pdb" || ext == ".ilk" || ext == ".log")
+            return false;
+        if (path->IndexOf("\\Files\\", StringComparison::OrdinalIgnoreCase) >= 0)
+            return false;
+        return true;
+    }
+
+    /* Завершение вспомогательного процесса только в сеансе текущего пользователя */
+    void wix_builder::stop_processes(SetupEventArgs^ e, string name) {
+        int my_session = Process::GetCurrentProcess()->SessionId;
+        for each (Process^ process in Process::GetProcessesByName(name)) {
+            try {
+                if (process->SessionId != my_session)
+                    continue;   /* процессы других сеансов не трогаем: отсюда и было "Отказано в доступе" */
+                process->Kill();
+                if (!process->WaitForExit(5000))
+                    e->Session->Log("wix: " + name + " (PID " + process->Id + ") не завершился за 5 с");
+            }
+            catch (InvalidOperationException^) {
+                /* процесс уже завершился */
+            }
+            catch (System::ComponentModel::Win32Exception^ ex) {
+                e->Session->Log("wix: не удалось завершить " + name + ": " + ex->Message);
+            }
+            finally {
+                delete process;
+            }
+        }
+    }
+
     string wix_builder::set_up_log_config() {
-        string app_data_directory = Environment::GetFolderPath(Environment::SpecialFolder::ApplicationData);
-        //IniFile^ ini_File = nullptr;
-        Directory::CreateDirectory(app_data_directory + "\\net8project");
+        /* Внимание: вызывается из main(), т.е. на машине сборки, а не у пользователя */
+        string app_data_directory = Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::ApplicationData), "net8project");
+        string log_path = Path::Combine(app_data_directory, "net8project.wix.log");
+        string inf_path = Path::Combine(app_data_directory, "ifcxeprt.inf");
+        Directory::CreateDirectory(app_data_directory);
 
         try {
-            ini_file = gcnew ini_plain(app_data_directory + "\\net8project\\ifcexprt.inf");
-        }
-        catch (const std::exception&){
-            System::IO::File::AppendAllText(app_data_directory + "\\net8project\\net8project.wix.log", DateTime::Now.ToString("dd.MM.yyyy hh:mm tt") + "wix: The inf-file not found!\n");
-        }
-        config_file_path = ini_file->read_string("wix_net8project", "log4net_config");
+            if (!System::IO::File::Exists(inf_path)) {
+                System::IO::File::AppendAllText(log_path, DateTime::Now.ToString("dd.MM.yyyy HH:mm:ss") + " wix: " + inf_path + " не найден" + Environment::NewLine);
+                return nullptr;
+            }
+            ini_file = gcnew ini_plain(inf_path);
+            config_file_path = ini_file->read_string("wix_net8project", "log4net_config");
 
-        if (config_file_path == ""){
-            System::IO::File::AppendAllText(app_data_directory + "\\net8project\\net8project.log", DateTime::Now.ToString("dd.MM.yyyy hh:mm tt") + "'[wix] log4net_appdata_config= ' key not found!\n");
-                /* throw gcnew FileNotFoundException("'[wix] log4net_appdata_config= ' key not found!"); */
+            if (String::IsNullOrEmpty(config_file_path)) {
+                System::IO::File::AppendAllText(log_path, DateTime::Now.ToString("dd.MM.yyyy HH:mm:ss") + " wix: ключ [wix_net8project] log4net_config не найден" + Environment::NewLine);
+                return nullptr;
+            }
+            config_file_path = Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::ApplicationData), config_file_path);
         }
-        config_file_path = app_data_directory + "\\" + config_file_path;
+        catch (Exception^ ex) {
+            /* исключения .NET не ловятся через catch (const std::exception&) */
+            System::IO::File::AppendAllText(log_path, DateTime::Now.ToString("dd.MM.yyyy HH:mm:ss") + " wix: " + ex->Message + Environment::NewLine);
+            config_file_path = nullptr;
+        }
 
         return config_file_path;
     }
@@ -154,88 +201,29 @@ namespace wix_installer {
 
     void wix_builder::msi_load(SetupEventArgs^ e) {
         if (e->IsUninstalling) {
-            array<Process^>^ arr_hprocesses = Process::GetProcessesByName("bgHelper");
-            if (arr_hprocesses->Length > 0)
-            {
-                try {
-                    for each (Process ^ process in arr_hprocesses) {
-                        process->Kill();
-                        process->WaitForExit();
-                    }
-                }
-                catch (...) {
-
-                }
-            }
-            array<Process^>^ arr_dprocesses = Process::GetProcessesByName("dbchecker");
-            if (arr_dprocesses->Length > 0) {
-                try {
-                    for each (Process ^ process in arr_dprocesses) {
-                        process->Kill();
-                        process->WaitForExit();
-                    }
-                }
-                catch (...) {}
-            }
+            stop_processes(e, "bgHelper");
+            stop_processes(e, "dbchecker");
         }
     }
 
     void wix_builder::msi_before_install(SetupEventArgs^ e) {
-        string path_to_file = System::IO::Path::Combine(e->InstallDir + "bgHelper.exe");
-        string path_to_db_checker = System::IO::Path::Combine(e->InstallDir + "dbchecker.exe");
-
-        for each (Process ^ process in Process::GetProcessesByName("bgHelper")) {
-            try {
-                process->Kill();
-            }
-            catch (...) {
-                /* У некоторых пользователей System::Diagnostics::Process->Kill() кидает System::ComponentModel::Win32Exception: Отказано в доступе */
-            }
-        }
-        for each (Process ^ process in Process::GetProcessesByName("dbchecker")) {
-            try {
-                process->Kill();
-            }
-            catch (...) {
-                /* У некоторых пользователей Process->Kill() выкидывает Win32Exception: Отказано в доступе */
-            }
-        }
-
-        if (e->IsInstalling) {
-            try {
-                Microsoft::Win32::RegistryKey^ key = Microsoft::Win32::Registry::CurrentUser->OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-                key->SetValue("ifc_exporter", path_to_file);
-                key->SetValue("db_checker", path_to_db_checker);
-            }
-            catch (...) {
-
-            }
-        }
+        /* Записи автозагрузки создаются в add_directories через RegValue */
+        stop_processes(e, "bgHelper");
+        stop_processes(e, "dbchecker");
     }
 
     void wix_builder::msi_after_install(SetupEventArgs^ e) {
-        string path_to_helper = System::IO::Path::Combine(e->InstallDir + "bgHelper.exe");
-        string path_to_db_checker = System::IO::Path::Combine(e->InstallDir + "dbchecker.exe");
+        /* Записи автозагрузки удаляет сам MSI при деинсталляции */
+        if (!e->IsInstalling)
+            return;
 
-        if (e->IsInstalling) {
-            try  {
-                Process::Start(path_to_helper);
-/*              Process::Start(pathToWrksctrl);         */
-                Process::Start(path_to_db_checker);
+        for each (string exe in gcnew array<string>{ "bgHelper.exe", "dbchecker.exe" }) {
+            string path = Path::Combine(e->InstallDir, exe);
+            try {
+                Process::Start(path);
             }
-            catch (...){
-
-            }
-        }
-
-        if (e->IsUninstalling) {
-            try {            
-                Microsoft::Win32::RegistryKey^ key = Microsoft::Win32::Registry::CurrentUser->OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-                key->DeleteValue("ifc_exporter", false);
-                key->DeleteValue("db_checker", false);
-            }
-            catch (...){
-
+            catch (Exception^ ex) {
+                e->Session->Log("wix: не удалось запустить " + path + ": " + ex->Message);
             }
         }
     }
