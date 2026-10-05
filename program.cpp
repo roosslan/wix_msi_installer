@@ -103,18 +103,31 @@ namespace wix_installer {
 		WixSharp::CommonTasks::Tasks::AddDir(project, gcnew Dir("%AppDataFolder%\\net8project", gcnew WixSharp::File(rel_files_from_dir + "\\Files\\app.config")));
         WixSharp::CommonTasks::Tasks::AddDir(project, gcnew Dir("%AppDataFolder%\\net8project", gcnew WixSharp::File(rel_files_from_dir + "\\Files\\ifcxeprt.inf")));
 
+        /* Надстройка ifc_exporter: Build\Addins\<год>\ifc_exporter.addin и Build\Addins\<год>\ifc_exporter\
+         * (раскладку готовит CI репозитория ifc_exporter_revit_addin) */
+        for each (string year in gcnew array<string>{ "2023", "2026" }) {
+            string addin_src = rel_files_from_dir + "\\Addins\\" + year;
+            if (!System::IO::Directory::Exists(addin_src))
+                continue;   /* при сборке без надстройки MSI собирается как раньше */
+            WixSharp::CommonTasks::Tasks::AddDir(project, gcnew Dir("%AppDataFolder%\\Autodesk\\Revit\\Addins\\" + year,
+                gcnew WixSharp::File(addin_src + "\\ifc_exporter.addin"),
+                gcnew Dir("ifc_exporter", gcnew WixSharp::Files(addin_src + "\\ifc_exporter\\*.*"))));
+        }
+
         /* Автозагрузка через таблицу Registry MSI: при удалении записи удаляются автоматически */
         string run_key = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
         WixSharp::CommonTasks::Tasks::AddRegValue(project, gcnew RegValue(RegistryHive::CurrentUser, run_key, "ifc_exporter", "\"[INSTALLDIR]bgHelper.exe\""));
         WixSharp::CommonTasks::Tasks::AddRegValue(project, gcnew RegValue(RegistryHive::CurrentUser, run_key, "db_checker", "\"[INSTALLDIR]dbchecker.exe\""));
     };
 
-    /* Фильтр файлов для .msi: отладочные файлы не включаются, содержимое Files\ раскладывается в add_directories */
+    /* Фильтр файлов для .msi: отладочные файлы не включаются, содержимое Files\ и Addins\ раскладывается в add_directories */
     bool wix_builder::is_payload(string path) {
         string ext = Path::GetExtension(path)->ToLowerInvariant();
         if (ext == ".pdb" || ext == ".ilk" || ext == ".log")
             return false;
         if (path->IndexOf("\\Files\\", StringComparison::OrdinalIgnoreCase) >= 0)
+            return false;
+        if (path->IndexOf("\\Addins\\", StringComparison::OrdinalIgnoreCase) >= 0)
             return false;
         return true;
     }
